@@ -37,8 +37,8 @@ jobs:
       - name: Testar resolução do nome do host
         run: |
           CONTAINER_ID=$(docker ps -q -f "name=postgres")
-          docker exec -i --rm $CONTAINER_ID ping postgres
-          docker exec -i --rm $CONTAINER_ID nslookup postgres
+          docker exec -i $CONTAINER_ID ping postgres
+          docker exec -i $CONTAINER_ID nslookup postgres
 
       - name: Test
         run: go test -v main_test.go
