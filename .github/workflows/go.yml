@@ -12,34 +12,24 @@ jobs:
     strategy:
       matrix:
         go_version: ['1.18', '1.17', '>=1.18']
-        os: ['ubuntu-latest', 'ubuntu-18.04']
+        os: ['ubuntu-latest', 'ubuntu-22.04']
     steps:
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install docker-compose -y
-
+      # 1. Baixa o código do repositório
       - uses: actions/checkout@v3
 
+      # 2. Configura a versão do Go
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go_version }}
 
-      - name: Build-DB
-        run: docker-compose build
-
+      # 3. Sobe o banco de dados
       - name: Create-DB
         run: |
-          docker-compose up -d
-          sleep 60
+          docker compose up -d
+          sleep 15
 
-      - name: Testar resolução do nome do host
-        run: |
-          CONTAINER_ID=$(docker ps -q -f "name=postgres")
-          docker exec -i $CONTAINER_ID ping postgres
-          docker exec -i $CONTAINER_ID nslookup postgres
-
+      # 4. Roda os testes
       - name: Test
         run: go test -v main_test.go
 
@@ -48,7 +38,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ['ubuntu-latest', 'ubuntu-18.04']
+        os: ['ubuntu-latest', 'ubuntu-22.04']
     steps:
       - uses: actions/checkout@v3
       - name: Build
