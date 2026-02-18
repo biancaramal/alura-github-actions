@@ -27,7 +27,7 @@ jobs:
       - name: Create-DB
         run: |
           docker compose up -d
-          sleep 15
+          sleep 20
 
       # 4. Roda os testes
       - name: Test
