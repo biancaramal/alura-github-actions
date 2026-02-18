@@ -33,7 +33,7 @@ jobs:
       - name: Create-DB
         run: |
           docker-compose up -d
-          sleep 10
+          sleep 60
 
       - name: Test
         run: go test -v main_test.go
