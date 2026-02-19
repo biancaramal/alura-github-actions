@@ -19,8 +19,7 @@ jobs:
           POSTGRES_PASSWORD: root
           POSTGRES_DB: root
         ports:
-          - 5432: 5432
-        # Garante que o serviço só continue quando o banco estiver PRONTO
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
