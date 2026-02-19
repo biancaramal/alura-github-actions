@@ -17,3 +17,11 @@ jobs:
         with:
             username: biancaramal
             password: ${{ secrets.PASSWORD_DOCKER_HUB}}
+
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v6.19.2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: biancaramal/go_ci:${{ github.ref_name }}
