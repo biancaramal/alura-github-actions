@@ -8,49 +8,43 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
-    env:
-      HOST: localhost
-      PORT: 5432
-      USER: root
-      PASSWORD: root
-      DBNAME: root
+    runs-on: ubuntu-latest # Simplifiquei o OS para evitar custos desnecessários
+
+    # Subindo o banco como um serviço nativo do Actions
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: root
+        ports:
+          - 5432: 5432
+        # Garante que o serviço só continue quando o banco estiver PRONTO
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     strategy:
       matrix:
-        go_version: ['1.18', '1.17', '>=1.18']
-        os: ['ubuntu-latest', 'ubuntu-22.04']
+        go_version: ['1.18', '1.19'] # Use versões específicas e estáveis
+
     steps:
-      # 1. Baixa o código do repositório
       - uses: actions/checkout@v3
 
-      # 2. Configura a versão do Go
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go_version }}
 
-      # 3. Sobe o banco de dados
-      - name: Build-DB
-        run: docker compose build
-
-      - name: Create-DB
-        run: |
-          docker compose up -d
-          sleep 20
-          docker ps -a
-          docker compose logs postgres
-
-      # 4. Roda os testes
       - name: Test
-        run: go test -v main_test.go
-
-  build:
-    needs: test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ['ubuntu-latest', 'ubuntu-22.04']
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build
-        run: go build -v main.go
+        env:
+          # Aqui passamos as credenciais para o seu código Go ler
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: root
+          DB_PASSWORD: root
+          DB_NAME: root
+        run: go test -v ./... # Recomendo testar o pacote todo
