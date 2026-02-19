@@ -8,9 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest # Simplifiquei o OS para evitar custos desnecessários
-
-    # Subindo o banco como um serviço nativo do Actions
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:latest
@@ -28,7 +26,7 @@ jobs:
 
     strategy:
       matrix:
-        go_version: ['1.18', '1.19'] # Use versões específicas e estáveis
+        go_version: ['1.18', '1.19']
 
     steps:
       - uses: actions/checkout@v3
@@ -40,10 +38,20 @@ jobs:
 
       - name: Test
         env:
-          # Aqui passamos as credenciais para o seu código Go ler
           DB_HOST: localhost
           DB_PORT: 5432
           DB_USER: root
           DB_PASSWORD: root
           DB_NAME: root
-        run: go test -v ./... # Recomendo testar o pacote todo
+        run: go test -v ./...
+
+  build:
+    needs: test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ 'ubuntu-latest', 'ubuntu-22.04' ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: go build -v main.go
