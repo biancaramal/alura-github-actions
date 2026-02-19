@@ -37,6 +37,8 @@ jobs:
         run: |
           docker compose up -d
           sleep 20
+          docker ps -a
+          docker compose logs postgres
 
       # 4. Roda os testes
       - name: Test
